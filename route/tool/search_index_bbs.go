@@ -26,6 +26,7 @@ type Bbs_search_document struct {
 	Date         string   `json:"date"`
 	Comment_code string   `json:"comment_code"`
 	Comment_data string   `json:"comment_data"`
+	Fingerprint  string   `json:"fingerprint"`
 }
 
 type bbs_search_index_change struct {
@@ -36,7 +37,7 @@ type bbs_search_index_change struct {
 var bbs_search_index_directory = filepath.Join("data", "bleve_bbs")
 var bbs_search_index_version_file = filepath.Join("data", "bleve_bbs.version")
 
-const bbs_search_index_version = "4"
+const bbs_search_index_version = "5"
 
 var bbs_search_index bleve.Index
 var bbs_search_index_lock sync.RWMutex
@@ -78,6 +79,7 @@ func Bbs_search_index_mapping() *mapping.IndexMappingImpl {
 	document_mapping.AddFieldMappingsAt("data", Search_index_field_mapping())
 	document_mapping.AddFieldMappingsAt("comment_data", Search_index_field_mapping())
 	document_mapping.AddFieldMappingsAt("date", Bbs_search_index_date_mapping())
+	document_mapping.AddFieldMappingsAt("fingerprint", Search_index_fingerprint_field_mapping())
 	index_mapping.DefaultMapping = document_mapping
 
 	return index_mapping
@@ -183,7 +185,7 @@ func Search_bbs_index_apply_change(index bleve.Index, key string, change bbs_sea
 	if change.Deleted {
 		return index.Delete(key)
 	}
-	return index.Index(key, change.Document)
+	return index.Index(key, Bbs_search_index_prepare_document(change.Document))
 }
 
 func Search_bbs_index_set_ready(index bleve.Index) {
@@ -334,7 +336,7 @@ func Search_bbs_index_rebuild_from_database() (return_err error) {
 		if current_key == "" || document.Title == "" {
 			return nil
 		}
-		if err := batch.Index(current_key, document); err != nil {
+		if err := batch.Index(current_key, Bbs_search_index_prepare_document(document)); err != nil {
 			return err
 		}
 		batch_count++
@@ -620,7 +622,7 @@ func Search_bbs_index_rebuild_comments(db *sql.DB, index bleve.Index) error {
 			return nil
 		}
 		key := Search_bbs_index_comment_key(document.Set_id, document.Set_code, document.Comment_code)
-		if err := batch.Index(key, document); err != nil {
+		if err := batch.Index(key, Bbs_search_index_prepare_document(document)); err != nil {
 			return err
 		}
 		batch_count++

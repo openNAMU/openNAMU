@@ -171,6 +171,7 @@ func Start_auto_backup_and_maintenance() {
 
 			db := DB_connect()
 			now := time.Now()
+			Search_index_consistency_audit_scheduled(db, state_dir, now)
 			backup_due := false
 			if backup_enabled {
 				back_up_value, setting_err := Maintenance_get_setting_value(db, "back_up")
@@ -227,6 +228,55 @@ func Start_auto_backup_and_maintenance() {
 			time.Sleep(auto_scheduler_check_interval)
 		}
 	}()
+}
+
+func Search_index_consistency_audit_scheduled(db *sql.DB, state_dir string, now time.Time) {
+	audit_tasks := []struct {
+		name string
+		run  func() (Search_index_consistency_result, error)
+	}{
+		{name: "document", run: func() (Search_index_consistency_result, error) {
+			return Search_index_consistency_audit_batch(db, state_dir, now)
+		}},
+		{name: "bbs", run: func() (Search_index_consistency_result, error) {
+			return Search_bbs_index_consistency_audit_batch(db, state_dir, now)
+		}},
+	}
+
+	for _, audit_task := range audit_tasks {
+		state_prefix := filepath.Join(state_dir, ".opennamu_"+audit_task.name+"_search_index_audit")
+		last_run_path := state_prefix + "_last_run"
+		retry_after_path := state_prefix + "_retry_after"
+		if !Auto_task_is_due(last_run_path, retry_after_path, auto_scheduler_check_interval, now) {
+			continue
+		}
+
+		result := Search_index_consistency_result{Index_name: audit_task.name}
+		run_err := Run_auto_scheduled_task(func() error {
+			var err error
+			result, err = audit_task.run()
+			return err
+		})
+		if run_err != nil {
+			log.Printf("[SEARCH] %s index consistency audit failed: %v", audit_task.name, run_err)
+			if retry_err := Record_auto_task_failure(retry_after_path, time.Now()); retry_err != nil {
+				log.Printf("[SEARCH] %s index consistency audit retry state write failed: %v", audit_task.name, retry_err)
+			}
+			continue
+		}
+		if err := Record_auto_task_success(last_run_path, retry_after_path, time.Now()); err != nil {
+			log.Printf("[SEARCH] %s index consistency audit success state write failed: %v", audit_task.name, err)
+			if retry_err := Record_auto_task_failure(retry_after_path, time.Now()); retry_err != nil {
+				log.Printf("[SEARCH] %s index consistency audit retry state write failed: %v", audit_task.name, retry_err)
+			}
+		}
+		if result.Cycle_completed {
+			log.Printf("[SEARCH] %s index consistency audit completed: missing=%d stale=%d orphaned=%d repaired=%d", audit_task.name, result.Total_missing, result.Total_stale, result.Total_orphaned, result.Total_repaired)
+		}
+		if result.Rebuild_requested {
+			log.Printf("[SEARCH] %s index consistency audit escalated to index rebuild", audit_task.name)
+		}
+	}
 }
 
 func Auto_run_is_due(last_run_path string, interval time.Duration, now time.Time) bool {

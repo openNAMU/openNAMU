@@ -43,6 +43,7 @@ var search_index_recovery_scenarios = []string{
 	"runtime_directory_loss",
 	"runtime_handle_error",
 	"concurrent_changes",
+	"content_divergence",
 }
 
 func Test_Search_index_recovery_scenarios(t *testing.T) {
@@ -171,10 +172,10 @@ func Test_Search_index_recovery_child(t *testing.T) {
 		search_index_recovery_create_bbs_index(t, bbs_index_directory)
 		search_index_recovery_create_document_index(t, document_index_directory+".tmp")
 		search_index_recovery_create_bbs_index(t, bbs_index_directory+".tmp")
-		if err := os.WriteFile(document_version_file, []byte("2"), 0o600); err != nil {
+		if err := os.WriteFile(document_version_file, []byte("3"), 0o600); err != nil {
 			t.Fatalf("write document marker: %v", err)
 		}
-		if err := os.WriteFile(bbs_version_file, []byte("4"), 0o600); err != nil {
+		if err := os.WriteFile(bbs_version_file, []byte("5"), 0o600); err != nil {
 			t.Fatalf("write BBS marker: %v", err)
 		}
 	case "interrupted_install":
@@ -246,8 +247,8 @@ func Test_Search_index_recovery_child(t *testing.T) {
 			backing string
 			version string
 		}{
-			{document_index_directory, filepath.Join("data", "document_backing"), "2"},
-			{bbs_index_directory, filepath.Join("data", "bbs_backing"), "4"},
+			{document_index_directory, filepath.Join("data", "document_backing"), "3"},
+			{bbs_index_directory, filepath.Join("data", "bbs_backing"), "5"},
 		} {
 			if strings.Contains(index.active, "bleve_bbs") {
 				search_index_recovery_create_bbs_index(t, index.backing)
@@ -288,6 +289,14 @@ func Test_Search_index_recovery_child(t *testing.T) {
 			t.Fatalf("write BBS marker: %v", err)
 		}
 	case "concurrent_changes":
+	case "content_divergence":
+		Search_index_recovery_create_divergent_indexes(t, document_index_directory, bbs_index_directory)
+		if err := os.WriteFile(document_version_file, []byte("3"), 0o600); err != nil {
+			t.Fatalf("write document marker: %v", err)
+		}
+		if err := os.WriteFile(bbs_version_file, []byte("5"), 0o600); err != nil {
+			t.Fatalf("write BBS marker: %v", err)
+		}
 	default:
 		t.Fatalf("unknown recovery scenario %q", scenario)
 	}
@@ -415,6 +424,8 @@ func Test_Search_index_recovery_child(t *testing.T) {
 		}
 	case "concurrent_changes":
 		search_index_recovery_apply_concurrent_changes(t, db, log_buffer)
+	case "content_divergence":
+		Search_index_recovery_assert_content_divergence(t, db)
 	case "source_read_error":
 		search_index_recovery_apply_source_read_error(t, db)
 	case "interrupted_install", "abandoned_staging", "staging_next_to_valid", "version_markers", "metadata_corruption", "startup_missing":
@@ -422,7 +433,7 @@ func Test_Search_index_recovery_child(t *testing.T) {
 		t.Fatalf("scenario %q did not reach its recovery path", scenario)
 	}
 
-	if scenario != "concurrent_changes" && scenario != "source_read_error" {
+	if scenario != "concurrent_changes" && scenario != "source_read_error" && scenario != "content_divergence" {
 		search_index_recovery_wait_for_indexes(t, 15*time.Second)
 		search_index_recovery_assert_source_results(t)
 	}
@@ -532,6 +543,188 @@ func search_index_recovery_create_bbs_index(t *testing.T, directory string) {
 	if err := index.Close(); err != nil {
 		t.Fatalf("close BBS Bleve index %q: %v", directory, err)
 	}
+}
+
+func Search_index_recovery_create_divergent_indexes(t *testing.T, document_directory string, bbs_directory string) {
+	t.Helper()
+	document_index, err := bleve.New(document_directory, tool.Search_index_mapping())
+	if err != nil {
+		t.Fatalf("create divergent document index: %v", err)
+	}
+	for title, data := range map[string]string{
+		"recovery-doc": "stale document content",
+		"orphan-doc":   "orphan document content",
+	} {
+		if err := document_index.Index(title, tool.Search_document{Title_search: title, Data: data}); err != nil {
+			document_index.Close()
+			t.Fatalf("seed divergent document %q: %v", title, err)
+		}
+	}
+	if err := document_index.Close(); err != nil {
+		t.Fatalf("close divergent document index: %v", err)
+	}
+
+	bbs_index, err := bleve.New(bbs_directory, tool.Bbs_search_index_mapping())
+	if err != nil {
+		t.Fatalf("create divergent BBS index: %v", err)
+	}
+	divergent_bbs_documents := []struct {
+		key      string
+		document tool.Bbs_search_document
+	}{
+		{tool.Search_bbs_index_key("91", "1"), tool.Bbs_search_document{Set_id: "91", Set_code: "1", Title: "stale-post", Data: "stale post content", Date: "2026-01-01"}},
+		{tool.Search_bbs_index_key("93", "1"), tool.Bbs_search_document{Set_id: "93", Set_code: "1", Title: "orphan-post", Data: "orphan post content", Date: "2026-01-01"}},
+		{tool.Search_bbs_index_comment_key("91", "1", "1"), tool.Bbs_search_document{Set_id: "91", Set_code: "1", Comment_code: "1", Comment_data: "stale nested comment", Date: "2026-01-01"}},
+		{tool.Search_bbs_index_comment_key("93", "1", "1"), tool.Bbs_search_document{Set_id: "93", Set_code: "1", Comment_code: "1", Comment_data: "orphan nested comment", Date: "2026-01-01"}},
+	}
+	for _, entry := range divergent_bbs_documents {
+		if err := bbs_index.Index(entry.key, entry.document); err != nil {
+			bbs_index.Close()
+			t.Fatalf("seed divergent BBS document %q: %v", entry.key, err)
+		}
+	}
+	if err := bbs_index.Close(); err != nil {
+		t.Fatalf("close divergent BBS index: %v", err)
+	}
+}
+
+func Search_index_recovery_assert_content_divergence(t *testing.T, db *sql.DB) {
+	t.Helper()
+	if !Search_index_recovery_wait_for_indexes_ready(10 * time.Second) {
+		t.Fatal("structurally valid divergent indexes did not open")
+	}
+
+	var source_document_count uint64
+	if err := db.QueryRow("select count(*) from data").Scan(&source_document_count); err != nil {
+		t.Fatalf("count SQL documents: %v", err)
+	}
+	var source_bbs_posts uint64
+	if err := db.QueryRow("select count(*) from (select distinct set_id, set_code from bbs_data where set_name = 'title') as bbs_posts").Scan(&source_bbs_posts); err != nil {
+		t.Fatalf("count SQL BBS posts: %v", err)
+	}
+	var source_bbs_comments uint64
+	if err := db.QueryRow("select count(*) from bbs_data where set_name = 'comment'").Scan(&source_bbs_comments); err != nil {
+		t.Fatalf("count SQL BBS comments: %v", err)
+	}
+
+	document_index_count := uint64(2) // The isolated divergent index contains one stale key and one orphan key.
+	if document_index_count != source_document_count {
+		t.Fatalf("document divergence probe requires equal counts, SQL=%d Bleve=%d", source_document_count, document_index_count)
+	}
+	document_results, document_ready := tool.Search_index_search("orchidtoken", "body", 0, 20)
+	if !document_ready || search_index_recovery_contains(document_results, "recovery-doc") {
+		t.Fatalf("document query did not expose silent stale/missing content: results=%v ready=%v", document_results, document_ready)
+	}
+
+	bbs_index_count := uint64(4) // The isolated BBS index contains two stale keys and two orphan keys.
+	expected_bbs_count := source_bbs_posts + source_bbs_comments
+	if bbs_index_count != expected_bbs_count {
+		t.Fatalf("BBS divergence probe requires equal counts, SQL=%d Bleve=%d", expected_bbs_count, bbs_index_count)
+	}
+	post_results, post_ready := tool.Search_bbs_index_search_data("posttoken", "91", 0, 20)
+	if !post_ready || search_index_recovery_contains(post_results, tool.Search_bbs_index_key("91", "1")) {
+		t.Fatalf("BBS post query did not expose silent stale/missing content: results=%v ready=%v", post_results, post_ready)
+	}
+	comment_results, comment_ready := tool.Search_bbs_index_search_comment("nestedtoken", "91", 0, 20)
+	if !comment_ready || search_index_recovery_contains(comment_results, tool.Search_bbs_index_comment_key("91", "1", "1")) {
+		t.Fatalf("nested-comment query did not expose silent stale/missing content: results=%v ready=%v", comment_results, comment_ready)
+	}
+	t.Logf("reproduced silent divergence before audit: document counts SQL=%d/Bleve=%d; BBS post+comment counts SQL=%d/Bleve=%d; all indexes report ready", source_document_count, document_index_count, expected_bbs_count, bbs_index_count)
+
+	var document_result tool.Search_index_consistency_result
+	var bbs_result tool.Search_index_consistency_result
+	document_complete := false
+	bbs_complete := false
+	for batch := 0; batch < 8 && (!document_complete || !bbs_complete); batch++ {
+		if !document_complete {
+			var err error
+			document_result, err = tool.Search_index_consistency_audit_batch(db, "data", time.Now())
+			if err != nil {
+				t.Fatalf("run document consistency audit batch: %v", err)
+			}
+			if document_result.Rebuild_requested {
+				t.Fatalf("small document divergence unexpectedly escalated to full rebuild: %+v", document_result)
+			}
+			document_complete = document_result.Cycle_completed
+		}
+		if !bbs_complete {
+			var err error
+			bbs_result, err = tool.Search_bbs_index_consistency_audit_batch(db, "data", time.Now())
+			if err != nil {
+				t.Fatalf("run BBS consistency audit batch: %v", err)
+			}
+			if bbs_result.Rebuild_requested {
+				t.Fatalf("small BBS divergence unexpectedly escalated to full rebuild: %+v", bbs_result)
+			}
+			bbs_complete = bbs_result.Cycle_completed
+		}
+	}
+	if !document_complete || !bbs_complete {
+		t.Fatalf("bounded consistency audits did not complete: document=%+v BBS=%+v", document_result, bbs_result)
+	}
+	if document_result.Total_repaired < 3 || document_result.Total_orphaned == 0 || document_result.Total_stale == 0 {
+		t.Fatalf("document audit did not count and repair all divergence types: %+v", document_result)
+	}
+	if bbs_result.Total_repaired < 6 || bbs_result.Total_orphaned == 0 || bbs_result.Total_stale == 0 {
+		t.Fatalf("BBS audit did not count and repair posts/comments: %+v", bbs_result)
+	}
+
+	document_results, document_ready = tool.Search_index_search("orchidtoken", "body", 0, 20)
+	if !document_ready || !search_index_recovery_contains(document_results, "recovery-doc") {
+		t.Fatalf("audit failed to repair stale document content: results=%v ready=%v", document_results, document_ready)
+	}
+	deleted_document_results, document_ready := tool.Search_index_search("deletetoken", "body", 0, 20)
+	if !document_ready || !search_index_recovery_contains(deleted_document_results, "deleted-doc") {
+		t.Fatalf("audit failed to restore a missing document key: results=%v ready=%v", deleted_document_results, document_ready)
+	}
+	orphan_document_results, document_ready := tool.Search_index_search("orphan", "body", 0, 20)
+	if !document_ready || search_index_recovery_contains(orphan_document_results, "orphan-doc") {
+		t.Fatalf("audit failed to remove an orphan document key: results=%v ready=%v", orphan_document_results, document_ready)
+	}
+	post_results, post_ready = tool.Search_bbs_index_search_data("posttoken", "91", 0, 20)
+	if !post_ready || !search_index_recovery_contains(post_results, tool.Search_bbs_index_key("91", "1")) {
+		t.Fatalf("audit failed to repair stale BBS post content: results=%v ready=%v", post_results, post_ready)
+	}
+	missing_post_results, post_ready := tool.Search_bbs_index_search_data("deletetoken", "92", 0, 20)
+	if !post_ready || !search_index_recovery_contains(missing_post_results, tool.Search_bbs_index_key("92", "1")) {
+		t.Fatalf("audit failed to restore a missing BBS post key: results=%v ready=%v", missing_post_results, post_ready)
+	}
+	orphan_post_results, post_ready := tool.Search_bbs_index_search_data("orphan", "93", 0, 20)
+	if !post_ready || search_index_recovery_contains(orphan_post_results, tool.Search_bbs_index_key("93", "1")) {
+		t.Fatalf("audit failed to remove an orphan BBS post key: results=%v ready=%v", orphan_post_results, post_ready)
+	}
+	comment_results, comment_ready = tool.Search_bbs_index_search_comment("nestedtoken", "91", 0, 20)
+	if !comment_ready || !search_index_recovery_contains(comment_results, tool.Search_bbs_index_comment_key("91", "1", "1")) {
+		t.Fatalf("audit failed to repair stale nested-comment content: results=%v ready=%v", comment_results, comment_ready)
+	}
+	missing_comment_results, comment_ready := tool.Search_bbs_index_search_comment("deletetoken", "92", 0, 20)
+	if !comment_ready || !search_index_recovery_contains(missing_comment_results, tool.Search_bbs_index_comment_key("92", "1", "1")) {
+		t.Fatalf("audit failed to restore a missing nested-comment key: results=%v ready=%v", missing_comment_results, comment_ready)
+	}
+	orphan_comment_results, comment_ready := tool.Search_bbs_index_search_comment("orphan", "93", 0, 20)
+	if !comment_ready || search_index_recovery_contains(orphan_comment_results, tool.Search_bbs_index_comment_key("93", "1", "1")) {
+		t.Fatalf("audit failed to remove an orphan nested-comment key: results=%v ready=%v", orphan_comment_results, comment_ready)
+	}
+
+	var unchanged_document string
+	if err := db.QueryRow("select data from data where title = ?", "recovery-doc").Scan(&unchanged_document); err != nil || unchanged_document != "orchidtoken original content" {
+		t.Fatalf("audit changed the authoritative document source: data=%q err=%v", unchanged_document, err)
+	}
+	var unchanged_comment string
+	if err := db.QueryRow("select set_data from bbs_data where set_name = 'comment' and set_id = ? and set_code = ?", "91-1", "1").Scan(&unchanged_comment); err != nil || unchanged_comment != "nestedtoken original comment" {
+		t.Fatalf("audit changed the authoritative BBS comment source: data=%q err=%v", unchanged_comment, err)
+	}
+}
+
+func Search_index_recovery_wait_for_indexes_ready(timeout time.Duration) bool {
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		if tool.Search_index_ready() && tool.Search_bbs_index_ready() {
+			return true
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	return false
 }
 
 func search_index_recovery_create_marker_directory(t *testing.T, marker_path string) {

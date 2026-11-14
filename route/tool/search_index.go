@@ -20,6 +20,7 @@ import (
 type Search_document struct {
 	Title_search string `json:"title_search"`
 	Data         string `json:"data"`
+	Fingerprint  string `json:"fingerprint"`
 }
 
 type search_index_change struct {
@@ -30,7 +31,7 @@ type search_index_change struct {
 var search_index_directory = filepath.Join("data", "bleve")
 var search_index_version_file = filepath.Join("data", "bleve.version")
 
-const search_index_version = "2"
+const search_index_version = "3"
 
 var search_index bleve.Index
 var search_index_lock sync.RWMutex
@@ -63,6 +64,7 @@ func Search_index_mapping() *mapping.IndexMappingImpl {
 	document_mapping.Dynamic = false
 	document_mapping.AddFieldMappingsAt("title_search", Search_index_field_mapping())
 	document_mapping.AddFieldMappingsAt("data", Search_index_field_mapping())
+	document_mapping.AddFieldMappingsAt("fingerprint", Search_index_fingerprint_field_mapping())
 	index_mapping.DefaultMapping = document_mapping
 
 	return index_mapping
@@ -99,7 +101,7 @@ func Search_index_apply_change(index bleve.Index, doc_name string, change search
 	if change.Deleted {
 		return index.Delete(doc_name)
 	}
-	return index.Index(doc_name, Search_document{Do_remove_spaces(doc_name), change.Data})
+	return index.Index(doc_name, Search_index_document(doc_name, change.Data))
 }
 
 func Search_index_set_ready(index bleve.Index) {
@@ -263,7 +265,7 @@ func Search_index_rebuild_from_database() (return_err error) {
 		if title == "" {
 			continue
 		}
-		if err := batch.Index(title, Search_document{Do_remove_spaces(title), data}); err != nil {
+		if err := batch.Index(title, Search_index_document(title, data)); err != nil {
 			return errors.Join(fmt.Errorf("prepare document index entry %q: %w", title, err), rows.Close())
 		}
 		batch_count++
