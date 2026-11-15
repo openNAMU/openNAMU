@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"mime"
 	"net/http"
 	"os"
@@ -15,6 +16,38 @@ import (
 )
 
 var view_image_file_cache_regex = regexp.MustCompile(`\.cache_v[0-9]+$`)
+
+func Get_image_file_document(db *sql.DB, stored_file_name string) (string, bool) {
+	if stored_file_name == "" || filepath.Base(stored_file_name) != stored_file_name || strings.ContainsAny(stored_file_name, `/\\`) {
+		return "", false
+	}
+
+	rows := tool.Get_file_rows(db)
+	defer rows.Close()
+
+	matched_document := ""
+	for rows.Next() {
+		document_name := ""
+		document_type := ""
+		if err := rows.Scan(&document_name, &document_type); err != nil {
+			return "", false
+		}
+
+		storage_path, valid := File_storage_path("", document_name)
+		if !valid || filepath.Base(storage_path) != stored_file_name {
+			continue
+		}
+		if matched_document != "" && matched_document != document_name {
+			return "", false
+		}
+		matched_document = document_name
+	}
+	if rows.Err() != nil || matched_document == "" {
+		return "", false
+	}
+
+	return matched_document, true
+}
 
 func View_image_file_mime_type(file_name string) string {
 	mime_type := "application/octet-stream"
@@ -175,6 +208,16 @@ func View_view_image_file(c *gin.Context) {
 	file_name = view_image_file_cache_regex.ReplaceAllString(file_name, "")
 	if file_name == "" || file_name == "." || file_name == ".." || file_name == "/" || strings.ContainsAny(file_name, `/\\`) {
 		c.String(http.StatusBadRequest, "")
+		return
+	}
+
+	document_name, found := Get_image_file_document(db, file_name)
+	if !found {
+		c.String(http.StatusNotFound, "")
+		return
+	}
+	if !tool.Check_acl(db, document_name, "", "render", config.IP) {
+		c.Status(http.StatusForbidden)
 		return
 	}
 

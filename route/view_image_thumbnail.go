@@ -50,8 +50,18 @@ func View_image_thumbnail(c *gin.Context) {
 	}
 
 	file_name := view_image_file_cache_regex.ReplaceAllString(raw_file_name, "")
-	if file_name == "" || file_name == "." || file_name == ".." {
+	if file_name == "" || file_name == "." || file_name == ".." || strings.ContainsAny(file_name, `/\\`) {
 		c.String(http.StatusBadRequest, "")
+		return
+	}
+
+	document_name, found := Get_image_file_document(db, file_name)
+	if !found {
+		c.String(http.StatusNotFound, "")
+		return
+	}
+	if !tool.Check_acl(db, document_name, "", "render", config.IP) {
+		c.Status(http.StatusForbidden)
 		return
 	}
 

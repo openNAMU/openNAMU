@@ -98,7 +98,7 @@ func Test_View_view_image_file_mime_and_response_contract(t *testing.T) {
 		{extension: "xz", mime_type: "application/x-xz"},
 		{extension: "zst", mime_type: "application/zstd"},
 		{extension: "unknown", mime_type: "application/octet-stream"},
-		{extension: "UPPER.PNG", mime_type: "image/png", inline: true},
+		{extension: "PNG", mime_type: "image/png", inline: true},
 	}
 
 	router := gin.New()
@@ -115,15 +115,24 @@ func Test_View_view_image_file_mime_and_response_contract(t *testing.T) {
 	for _, test_case := range mime_cases {
 		t.Run(test_case.extension, func(t *testing.T) {
 			file_name := "phase9." + test_case.extension
-			if test_case.extension == "UPPER.PNG" {
-				file_name = "phase9.UPPER.PNG"
+			if test_case.extension == "PNG" {
+				file_name = "phase9_upper.PNG"
 			}
 			file_body := []byte("file body:" + test_case.extension)
-			if err := os.WriteFile(filepath.Join(image_dir, file_name), file_body, 0600); err != nil {
-				t.Fatalf("write fixture %s: %v", file_name, err)
+			file_extension := strings.ToLower(strings.TrimPrefix(filepath.Ext(file_name), "."))
+			file_base := strings.TrimSuffix(file_name, filepath.Ext(file_name))
+			storage_name := tool.File_name_to_dir(file_base, file_extension)
+			if _, err := db.Exec(`insert into data (title, data, type) values (?, '', '')`, "file:"+file_name); err != nil {
+				t.Fatalf("seed file document %s: %v", file_name, err)
+			}
+			if err := os.WriteFile(filepath.Join(image_dir, storage_name), file_body, 0600); err != nil {
+				t.Fatalf("write fixture %s: %v", storage_name, err)
+			}
+			if resolved_document, found := route.Get_image_file_document(db, storage_name); !found || resolved_document != "file:"+file_name {
+				t.Fatalf("storage %q resolved to %q (found=%v), want %q", storage_name, resolved_document, found, "file:"+file_name)
 			}
 
-			response := make_request(file_name, "192.0.2.88:1234")
+			response := make_request(storage_name, "192.0.2.88:1234")
 			if response.Code != http.StatusOK {
 				t.Fatalf("status = %d, want %d: %s", response.Code, http.StatusOK, response.Body.String())
 			}
@@ -133,7 +142,7 @@ func Test_View_view_image_file_mime_and_response_contract(t *testing.T) {
 				if test_case.mime_type != "image/svg+xml" {
 					want_mime = "application/octet-stream"
 				}
-				want_disposition = mime.FormatMediaType("attachment", map[string]string{"filename": file_name})
+				want_disposition = mime.FormatMediaType("attachment", map[string]string{"filename": storage_name})
 			}
 			if got := response.Header().Get("Content-Type"); got != want_mime {
 				t.Fatalf("Content-Type = %q, want %q", got, want_mime)
@@ -150,29 +159,26 @@ func Test_View_view_image_file_mime_and_response_contract(t *testing.T) {
 		})
 	}
 
-	t.Run("extensionless file uses attachment fallback", func(t *testing.T) {
-		file_body := []byte("extensionless file")
-		if err := os.WriteFile(filepath.Join(image_dir, "extensionless"), file_body, 0600); err != nil {
+	t.Run("orphaned extensionless file is not served without a file document", func(t *testing.T) {
+		if err := os.WriteFile(filepath.Join(image_dir, "extensionless"), []byte("orphaned file"), 0600); err != nil {
 			t.Fatalf("write extensionless fixture: %v", err)
 		}
 		response := make_request("extensionless", "192.0.2.88:1234")
-		if response.Code != http.StatusOK || response.Body.String() != string(file_body) {
-			t.Fatalf("extensionless response = (%d, %q), want file body", response.Code, response.Body.String())
-		}
-		if got := response.Header().Get("Content-Type"); got != "application/octet-stream" {
-			t.Fatalf("extensionless Content-Type = %q", got)
-		}
-		if got := response.Header().Get("Content-Disposition"); got != mime.FormatMediaType("attachment", map[string]string{"filename": "extensionless"}) {
-			t.Fatalf("extensionless Content-Disposition = %q", got)
+		if response.Code != http.StatusNotFound || response.Body.Len() != 0 {
+			t.Fatalf("extensionless response = (%d, %q), want empty 404", response.Code, response.Body.String())
 		}
 	})
 
-	t.Run("cache version serves base file with immutable cache header", func(t *testing.T) {
+	t.Run("cache version serves mapped base file with immutable cache header", func(t *testing.T) {
 		file_body := []byte("cached image")
-		if err := os.WriteFile(filepath.Join(image_dir, "cached.png"), file_body, 0600); err != nil {
+		storage_name := tool.File_name_to_dir("cached", "png")
+		if _, err := db.Exec(`insert into data (title, data, type) values ('file:cached.png', '', '')`); err != nil {
+			t.Fatalf("seed cached file document: %v", err)
+		}
+		if err := os.WriteFile(filepath.Join(image_dir, storage_name), file_body, 0600); err != nil {
 			t.Fatalf("write cache fixture: %v", err)
 		}
-		response := make_request("cached.png.cache_v42", "192.0.2.88:1234")
+		response := make_request(storage_name+".cache_v42", "192.0.2.88:1234")
 		if response.Code != http.StatusOK || response.Body.String() != string(file_body) {
 			t.Fatalf("cache response = (%d, %q), want file body", response.Code, response.Body.String())
 		}

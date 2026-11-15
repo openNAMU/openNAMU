@@ -169,6 +169,15 @@ always used. The catch-all `0.0.0.0/0` / `::/0` is rejected.
   real client address. Without a trusted proxy, openNAMU sees the nginx IP.
 - **Cloudflare**: set *Header to get IP* to `HTTP_CF_CONNECTING_IP` and add your
   Cloudflare edge IP range to *Trusted proxies*.
+- **Python WSGI (`app.py`)**: the bridge replaces client-supplied IP-forwarding
+  headers with the validated WSGI `REMOTE_ADDR`. If a reverse proxy is in front
+  of WSGI, configure the WSGI server/proxy middleware to put the client IP in
+  `REMOTE_ADDR` only after validating the immediate proxy. Otherwise, openNAMU
+  sees the WSGI peer address. Trust only the exact WSGI-to-Go peer in the Go
+  backend (normally `127.0.0.1`) and use a forwarding-header mode for the bridge
+  address to be applied. Without that trust entry, Go ignores the bridge headers
+  and uses its peer address as the identity; do not trust the whole loopback range
+  or grant elevated IP permissions to the bridge address.
 
 Restart openNAMU after changing the setting.
 

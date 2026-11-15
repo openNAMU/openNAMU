@@ -102,7 +102,9 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		render_data += View_w_category_data(db, config, doc_name)
 	} else if strings.HasPrefix(doc_name, "file:") {
 		document_type = "special"
-		render_data = View_w_file_data(db, doc_name) + render_data
+		if status == http.StatusOK {
+			render_data = View_w_file_data(db, doc_name) + render_data
+		}
 	} else {
 		if _, exists := tool.Get_back_link(db, doc_name, "include"); exists {
 			document_type = "include"

@@ -3,6 +3,7 @@
 import contextlib
 import errno
 import http.client
+import ipaddress
 import json
 import os
 import platform
@@ -406,7 +407,16 @@ def wsgi_path(environ):
     return path
 
 
+def wsgi_client_ip(environ):
+    remote_addr = environ.get("REMOTE_ADDR", "")
+    try:
+        return str(ipaddress.ip_address(remote_addr))
+    except (TypeError, ValueError) as error:
+        raise ValueError("invalid WSGI REMOTE_ADDR") from error
+
+
 def wsgi_headers(environ, target_host, target_port):
+    client_ip = wsgi_client_ip(environ)
     headers = {}
     excluded = {
         "connection",
@@ -420,6 +430,12 @@ def wsgi_headers(environ, target_host, target_port):
         "transfer-encoding",
         "upgrade",
     }
+    identity_headers = {
+        "x-real-ip",
+        "x-forwarded-for",
+        "cf-connecting-ip",
+        "forwarded",
+    }
 
     for key, value in environ.items():
         if key.startswith("HTTP_"):
@@ -429,11 +445,13 @@ def wsgi_headers(environ, target_host, target_port):
         else:
             continue
 
-        if header_name.lower() not in excluded:
+        if header_name.lower() not in excluded and header_name.lower() not in identity_headers:
             headers[header_name] = value
 
     headers["Host"] = environ.get("HTTP_HOST", target_host + ":" + str(target_port))
-    headers["X-Real-IP"] = environ.get("HTTP_X_REAL_IP", environ.get("REMOTE_ADDR", ""))
+    headers["X-Real-IP"] = client_ip
+    headers["CF-Connecting-IP"] = client_ip
+    headers["X-Forwarded-For"] = client_ip
     headers["X-Forwarded-Proto"] = environ.get(
         "HTTP_X_FORWARDED_PROTO",
         environ.get("wsgi.url_scheme", "http"),
@@ -442,6 +460,19 @@ def wsgi_headers(environ, target_host, target_port):
 
 
 def wsgi_application(environ, start_response):
+    try:
+        wsgi_client_ip(environ)
+    except ValueError:
+        body = b"invalid WSGI remote address"
+        start_response(
+            "400 Bad Request",
+            [
+                ("Content-Type", "text/plain; charset=utf-8"),
+                ("Content-Length", str(len(body))),
+            ],
+        )
+        return [body]
+
     base_dir = Path(__file__).resolve().parent
     target_host = os.environ.get("NAMU_WSGI_HOST", "127.0.0.1")
     target_port = os.environ.get("NAMU_WSGI_PORT", "3001")
