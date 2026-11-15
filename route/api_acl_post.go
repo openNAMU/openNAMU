@@ -30,13 +30,7 @@ func Save_acl(db tool.DB_runner, config tool.Config, doc_name string, values url
 		}
 	}
 
-	document_markup_value := values.Get("document_markup")
-	switch document_markup_value {
-	case "custom":
-		document_markup_value = "html"
-	case "raw":
-		document_markup_value = "plain"
-	}
+	document_markup_value := Setting_markup_storage_value(values.Get("document_markup"))
 	tool.Exec_DB(db, "delete from data_set where doc_name = ? and set_name = 'document_markup'", doc_name)
 	tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_markup', ?)", doc_name, document_markup_value)
 	for _, field := range []string{"document_top", "document_editor_top"} {
@@ -51,7 +45,7 @@ func Save_acl(db tool.DB_runner, config tool.Config, doc_name string, values url
 			continue
 		}
 		tool.Exec_DB(db, "delete from data_set where doc_name = ? and set_name = ?", doc_name, field)
-		tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', ?, ?)", doc_name, field, Setting_markup_normalize(values.Get(field)))
+		tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', ?, ?)", doc_name, field, Setting_markup_storage_value(values.Get(field)))
 	}
 
 	tool.Exec_DB(db, "delete from acl where title = ? and type = 'why'", doc_name)
@@ -105,12 +99,18 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 
 	return_data := make(map[string]any)
 	allowed := tool.Check_permission(db, "document_acl_manage", config.IP)
-	if strings.HasPrefix(doc_name, "user:") && strings.TrimPrefix(doc_name, "user:") == config.IP {
+	if !multiple && strings.HasPrefix(doc_name, "user:") && strings.TrimPrefix(doc_name, "user:") == config.IP {
 		allowed = true
 	}
 	if !allowed {
 		return_data["response"] = "require auth"
 		return return_data
+	}
+
+	for _, field := range []string{"document_markup", "document_top_markup", "document_editor_top_markup"} {
+		if _, exists := values[field]; exists && !Setting_markup_value_valid(values.Get(field)) {
+			return map[string]any{"response": "error", "data": "invalid data"}
+		}
 	}
 
 	if values.Get("acl_action") != "" {

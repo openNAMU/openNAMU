@@ -49,15 +49,10 @@ func Api_w_set_put(config tool.Config, doc_name string, set_name string, data st
 	}
 
 	if set_name == "document_markup" || set_name == "document_top_markup" || set_name == "document_editor_top_markup" {
-		switch data {
-		case "custom":
-			data = "html"
-		case "raw":
-			data = "plain"
-		}
-		if data != "" && !tool.Arr_in_str(Setting_markup_options(), data) {
+		if !Setting_markup_value_valid(data) {
 			return map[string]any{"response": "error", "data": "invalid data"}
 		}
+		data = Setting_markup_storage_value(data)
 	}
 
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {

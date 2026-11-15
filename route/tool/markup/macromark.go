@@ -2,9 +2,11 @@ package markup
 
 import (
 	"database/sql"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"opennamu/route/tool"
 )
@@ -149,14 +151,57 @@ func Macromark_split_macro_data(class *macromark, macro_data string, count int) 
 }
 
 func Macromark_safe_url(data string) string {
-	lower := strings.ToLower(strings.TrimSpace(data))
-	if strings.HasPrefix(lower, "javascript:") ||
-		strings.HasPrefix(lower, "vbscript:") ||
-		strings.HasPrefix(lower, "data:") {
+	data = strings.TrimSpace(data)
+	if data == "" || strings.IndexFunc(data, unicode.IsControl) >= 0 {
 		return "#"
 	}
 
+	parsed_url, err := url.Parse(data)
+	if err != nil {
+		return "#"
+	}
+	if parsed_url.Scheme != "" {
+		switch strings.ToLower(parsed_url.Scheme) {
+		case "http", "https", "ftp":
+			if parsed_url.Host == "" || parsed_url.Opaque != "" {
+				return "#"
+			}
+		case "mailto", "tel":
+			if parsed_url.Opaque == "" && parsed_url.Path == "" {
+				return "#"
+			}
+		default:
+			return "#"
+		}
+	}
+
 	return data
+}
+
+func Macromark_safe_external_url(data string) string {
+	safe_url := Macromark_safe_url(data)
+	parsed_url, err := url.Parse(safe_url)
+	if err != nil || safe_url == "#" {
+		return ""
+	}
+
+	switch strings.ToLower(parsed_url.Scheme) {
+	case "http", "https", "ftp":
+		if parsed_url.Host == "" || parsed_url.Opaque != "" {
+			return ""
+		}
+	case "tel":
+		if parsed_url.Opaque == "" && parsed_url.Path == "" {
+			return ""
+		}
+	case "":
+		if !strings.HasPrefix(safe_url, "//") || parsed_url.Host == "" {
+			return ""
+		}
+	default:
+		return ""
+	}
+	return safe_url
 }
 
 var block_html = func(class *macromark, macro_name string, macro_data string, m_string string) {
@@ -390,13 +435,23 @@ var macro_transform_map = map[string]macro_data{
 
 				a_data_link = strings.ReplaceAll(a_data_link, "<temp>", ",")
 				a_data_view = strings.ReplaceAll(a_data_view, "<temp>", ",")
+				if len(part) < 2 {
+					a_data_view = tool.HTML_escape(a_data_link)
+				}
 
-				if strings.HasPrefix(strings.ToLower(a_data_link), "mailto:") {
+				parsed_url, parse_err := url.Parse(a_data_link)
+				if parse_err == nil && strings.EqualFold(parsed_url.Scheme, "mailto") {
 					class.render_data = strings.Replace(class.render_data, m_string, a_data_view, 1)
 					return
 				}
 
-				temp_name := class.Func_temp_save("<a class=\"opennamu_link_out\" href=\""+tool.HTML_escape(a_data_link)+"\">"+a_data_view+"</a>", m_string)
+				safe_url := Macromark_safe_external_url(a_data_link)
+				if safe_url == "" {
+					class.render_data = strings.Replace(class.render_data, m_string, a_data_view, 1)
+					return
+				}
+
+				temp_name := class.Func_temp_save("<a class=\"opennamu_link_out\" href=\""+tool.HTML_escape(safe_url)+"\">"+a_data_view+"</a>", m_string)
 				class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
 			},
 			"b":   simple_html,

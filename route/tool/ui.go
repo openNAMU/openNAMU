@@ -728,6 +728,8 @@ func Get_markup_select_ui(db *sql.DB, config Config, doc_name string, markup str
 			doc_name,
 		)
 	}
+	default_markup = Normalize_document_markup(default_markup)
+	markup_load = Normalize_document_markup(markup_load)
 
 	markup_list := []string{"normal"}
 	markup_list = append(markup_list, Get_init_set_list("markup")["markup"]["list"].([]string)...)

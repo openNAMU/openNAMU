@@ -16,7 +16,7 @@ func List_markup() []string {
 		"namumark_beta",
 		"macromark",
 		"markdown",
-		"html",
+		"raw",
 		"plain",
 	}
 }
@@ -54,6 +54,7 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 // features that must authorize document reads. The value is never read from
 // parameter_data.
 func Get_render_direct_with_requester(db *sql.DB, doc_name string, data string, markup string, render_name string, render_type string, parameter_data map[string]any, requester string) map[string]string {
+	markup = tool.Normalize_document_markup(markup)
 	if parameter_data == nil {
 		parameter_data = map[string]any{}
 	}
@@ -130,9 +131,6 @@ func Get_render_direct_with_requester(db *sql.DB, doc_name string, data string, 
 		case "macromark":
 			render_data_class := Macromark_new(db, doc_data_set, "html")
 			render_data = render_data_class.Main()
-		case "html", "custom":
-			render_data["data"] = data
-			render_data["js_data"] = ""
 		default:
 			render_data["data"] = strings.ReplaceAll(tool.HTML_escape(data), "\n", "<br>")
 			render_data["js_data"] = ""

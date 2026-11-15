@@ -10,20 +10,26 @@ import (
 )
 
 func Setting_markup_normalize(markup_name string) string {
-	switch markup_name {
-	case "", "custom":
-		return "html"
-	case "raw":
+	markup_name = tool.Normalize_document_markup(markup_name)
+	if markup_name == "" || !tool.Arr_in_str(markup.List_markup(), markup_name) {
+		return "raw"
+	}
+	return markup_name
+}
+
+func Setting_markup_value_valid(markup_name string) bool {
+	return markup_name == "" || tool.Arr_in_str(Setting_markup_options(), markup_name)
+}
+
+func Setting_markup_storage_value(markup_name string) string {
+	if markup_name == "" {
+		return ""
+	}
+	markup_name = tool.Normalize_document_markup(markup_name)
+	if markup_name == "raw" {
 		return "plain"
 	}
-
-	for _, available_markup := range markup.List_markup() {
-		if markup_name == available_markup {
-			return markup_name
-		}
-	}
-
-	return "html"
+	return markup_name
 }
 
 func Setting_markup_value(db *sql.DB, setting_name string) string {
@@ -56,10 +62,6 @@ func Setting_render_markup(db *sql.DB, data string, markup_name string) string {
 
 func Setting_render_markup_with_requester(db *sql.DB, data string, markup_name string, requester_identity string) string {
 	markup_name = Setting_markup_normalize(markup_name)
-	if markup_name == "html" {
-		return data
-	}
-
 	render_data := markup.Get_render_direct_with_requester(
 		db,
 		"",

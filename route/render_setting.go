@@ -5,11 +5,11 @@ import (
 	"regexp"
 	"strings"
 
+	"golang.org/x/net/html"
 	"opennamu/route/tool"
 )
 
 var render_external_link_regex = regexp.MustCompile(`(?is)<a\b([^>]*\bclass="[^"]*\bopennamu_link_out\b[^"]*"[^>]*)>`)
-var render_target_regex = regexp.MustCompile(`(?i)\btarget\s*=`)
 
 func Move_render_category_top(data string) string {
 	category_start := strings.LastIndex(data, `<div class="opennamu_category" id="cate">`)
@@ -41,9 +41,19 @@ func Move_render_category_top(data string) string {
 func Add_render_external_link_target(data string) string {
 	return render_external_link_regex.ReplaceAllStringFunc(data, func(value string) string {
 		match := render_external_link_regex.FindStringSubmatch(value)
-		if len(match) < 2 || render_target_regex.MatchString(match[1]) {
+		if len(match) < 2 {
 			return value
 		}
+
+		tokenizer := html.NewTokenizer(strings.NewReader(value))
+		if tokenizer.Next() == html.StartTagToken {
+			for _, attribute := range tokenizer.Token().Attr {
+				if strings.EqualFold(attribute.Key, "target") {
+					return value
+				}
+			}
+		}
+
 		return `<a` + match[1] + ` target="_blank">`
 	})
 }

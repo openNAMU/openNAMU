@@ -51,13 +51,13 @@ func Api_bbs_w_set_put(config tool.Config, set_id string, set_name string, data 
 			return_data["data"] = "invalid bbs slow mode"
 			return return_data
 		}
-		if set_name == "bbs_markup" {
-			switch data {
-			case "custom":
-				data = "html"
-			case "raw":
-				data = "plain"
+		if set_name == "bbs_markup" && data != "normal" {
+			if !Setting_markup_value_valid(data) {
+				return_data["response"] = "error"
+				return_data["data"] = "invalid markup"
+				return return_data
 			}
+			data = Setting_markup_storage_value(data)
 		}
 		if auth_info {
 			if err := Bbs_board_write_transaction(db, set_id, "", func(tx *sql.Tx) error {

@@ -424,6 +424,15 @@ func Do_add_recent_history(db DB_runner, mode string, id string, title string, d
 	)
 }
 
+func Normalize_document_markup(markup string) string {
+	switch markup {
+	case "html", "custom":
+		return "raw"
+	default:
+		return markup
+	}
+}
+
 func Get_document_markup(db *sql.DB, doc_name string, do_type string) string {
 	markup := ""
 
@@ -448,7 +457,7 @@ func Get_document_markup(db *sql.DB, doc_name string, do_type string) string {
 		markup = "namumark"
 	}
 
-	return markup
+	return Normalize_document_markup(markup)
 }
 
 func Get_document_is_redirect(db *sql.DB, doc_name string) bool {

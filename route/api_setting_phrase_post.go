@@ -15,11 +15,16 @@ func Api_setting_phrase_post(config tool.Config, form map[string]string) map[str
 		return_data["response"] = "require auth"
 		return return_data
 	}
+	for _, field := range Setting_phrase_fields() {
+		if field.markup && !Setting_markup_value_valid(Setting_form_value(form, field.name+"_markup", "")) {
+			return map[string]any{"response": "error", "data": "invalid data"}
+		}
+	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		for _, field := range Setting_phrase_fields() {
 			Setting_save_value(tx, field.name, "", Setting_form_value(form, field.name, ""))
 			if field.markup {
-				Setting_save_value(tx, field.name+"_markup", "", Setting_markup_normalize(Setting_form_value(form, field.name+"_markup", "")))
+				Setting_save_value(tx, field.name+"_markup", "", Setting_markup_storage_value(Setting_form_value(form, field.name+"_markup", "")))
 			}
 		}
 		tool.Do_insert_auth_history(tx, config.IP, "edit_set (phrase)")

@@ -77,6 +77,12 @@ func Emergency_exec(db *sql.DB, query string, values ...any) error {
 }
 
 func Emergency_set_other(db *sql.DB, name string, data string) error {
+	if name == "markup" {
+		if !Setting_markup_value_valid(data) {
+			return fmt.Errorf("invalid markup")
+		}
+		data = Setting_markup_storage_value(data)
+	}
 	if err := Emergency_exec(db, "update other set data = ? where name = ?", data, name); err != nil {
 		return err
 	}
