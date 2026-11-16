@@ -1,7 +1,7 @@
 [(en-US)](./readme-en.md) | [(ko-KR)](./readme.md)
 
 # 오픈나무
-[![Go 1.25 이상](https://img.shields.io/badge/go-%3E%3D1.25-blue.svg)](https://go.dev/)
+[![Go 1.26 이상](https://img.shields.io/badge/go-%3E%3D1.26-blue.svg)](https://go.dev/)
 [![라이선스](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](https://raw.githubusercontent.com/openNAMU/openNAMU/beta/.github/logo.png)
@@ -27,6 +27,19 @@
 ```bash
 ./main.amd64.bin
 ```
+
+### Docker Hub
+
+이미지는 `linux/amd64`, `linux/arm64`를 지원합니다. `latest`는 정식 릴리즈에만 갱신되므로 버전을 고정하려면 버전 태그를 사용하세요.
+
+```sh
+docker run -d --name opennamu --restart unless-stopped \
+  -p 3000:3000 \
+  -v opennamu-data:/data \
+  opennamu/opennamu:latest
+```
+
+`/data` 볼륨에 DB, `data/set.json`, 업로드 파일 등 실행 중 생성되는 데이터가 저장됩니다. 새 이미지로 컨테이너를 교체할 때도 이 볼륨을 유지하세요. 이미지는 UID/GID `10001`로 실행됩니다. Docker named volume은 바로 사용할 수 있지만, 호스트 디렉터리를 bind mount할 때는 해당 UID가 쓸 수 있어야 합니다. 컨테이너에서는 openNAMU 자체 바이너리 업데이트 대신 새 이미지를 받아 교체하세요.
 
 ### Alpine Linux
 
@@ -86,7 +99,7 @@ apk add --no-cache gcompat libgcc
 
 ### 빌드 및 테스트
 
-소스에서 빌드하려면 Go 1.25 이상이 필요합니다.
+소스에서 빌드하려면 Go 1.26 이상이 필요합니다.
 
 ```bash
 ./linux.sh linux_amd64
@@ -111,6 +124,10 @@ go build -o main .
 go test ./...
 go vet ./...
 ```
+
+### Docker Hub 이미지 게시 (관리자)
+
+태그 릴리즈 워크플로는 바이너리 릴리즈가 성공한 뒤 멀티아키텍처 이미지를 게시합니다. 활성화하려면 GitHub Actions 저장소 변수 `DOCKERHUB_PUBLISH`를 `true`로 설정하고, Docker Hub 액세스 토큰을 `DOCKERHUB_TOKEN` 시크릿으로, 로그인 이름을 `DOCKERHUB_USERNAME` 시크릿으로 등록하세요. 필요하면 `DOCKERHUB_IMAGE` 변수에 소문자 `namespace/repository` 이름을 설정합니다. 기본 이미지는 `opennamu/opennamu`입니다. 버전 태그는 그대로 게시하고, 하이픈이 없는 정식 태그만 `latest`를 갱신합니다.
 
 ## 데이터베이스 설정
 

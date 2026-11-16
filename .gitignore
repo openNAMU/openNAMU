@@ -1,6 +1,7 @@
 *
 !*/
 !*.*
+!Dockerfile
 
 __pycache__
 backend.log

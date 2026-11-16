@@ -1,7 +1,7 @@
 [(en-US)](./readme-en.md) | [(ko-KR)](./readme.md)
 
 # openNAMU
-[![Go 1.25+](https://img.shields.io/badge/go-%3E%3D1.25-blue.svg)](https://go.dev/)
+[![Go 1.26+](https://img.shields.io/badge/go-%3E%3D1.26-blue.svg)](https://go.dev/)
 [![LICENSE](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](https://raw.githubusercontent.com/openNAMU/openNAMU/beta/.github/logo.png)
@@ -25,6 +25,19 @@ Download the binary for your operating system and architecture from the [Release
 ```bash
 ./main.amd64.bin
 ```
+
+### Docker Hub
+
+The image publishes `linux/amd64` and `linux/arm64` builds. The `latest` tag follows stable releases; use a version tag to pin a release.
+
+```sh
+docker run -d --name opennamu --restart unless-stopped \
+  -p 3000:3000 \
+  -v opennamu-data:/data \
+  opennamu/opennamu:latest
+```
+
+The `/data` volume stores the database, `data/set.json`, uploaded files, and other runtime data. Keep it when replacing the container with a newer image. The image runs as UID/GID `10001`; named Docker volumes are ready to use, while a bind-mounted directory must be writable by that ID. Container upgrades should use a new image rather than enabling openNAMU's in-place binary updater.
 
 ### Alpine Linux
 
@@ -84,7 +97,7 @@ You can clone this repository by entering the following command at the terminal 
 
 ### Build and test
 
-Go 1.25 or later is required to build from source.
+Go 1.26 or later is required to build from source.
 
 ```bash
 ./linux.sh linux_amd64
@@ -109,6 +122,10 @@ Run the following checks before submitting changes:
 go test ./...
 go vet ./...
 ```
+
+### Docker Hub publishing (maintainers)
+
+The tag release workflow publishes a multi-platform image after the binary release succeeds. To enable it, set the GitHub Actions repository variable `DOCKERHUB_PUBLISH` to `true`, add the `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` secrets (use a Docker Hub access token), and, if needed, set `DOCKERHUB_IMAGE` to the lowercase `namespace/repository` image name. The default image is `opennamu/opennamu`. Version tags are published as-is; `latest` is only moved by tags without a prerelease suffix.
 
 ## Database configuration
 
