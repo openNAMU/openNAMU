@@ -48,3 +48,35 @@ func Test_View_w_uses_existing_document_settings_and_markup(t *testing.T) {
 		})
 	}
 }
+
+func Test_View_w_renders_trusted_html_document_top(t *testing.T) {
+	for _, backend := range []string{"sqlite", "turso"} {
+		t.Run(backend, func(t *testing.T) {
+			db := audit_setup(t, backend)
+			audit_seed_auth(db, t)
+
+			exec := func(query string, args ...any) {
+				t.Helper()
+				if _, err := db.Exec(query, args...); err != nil {
+					t.Fatalf("seed %q: %v", query, err)
+				}
+			}
+			exec(`insert into other (name, data, coverage) values ('related_document_enabled', '0', '')`)
+			exec(`insert into data (title, data, type) values ('HtmlTopDoc', 'document body', '')`)
+			exec(`insert into data_set (doc_name, doc_rev, set_name, set_data) values ('HtmlTopDoc', '', 'document_top', '<b>HTML_VIEW_TOP_MARKER</b>')`)
+			exec(`insert into data_set (doc_name, doc_rev, set_name, set_data) values ('HtmlTopDoc', '', 'document_top_markup', 'html')`)
+
+			gin.SetMode(gin.TestMode)
+			context, _ := gin.CreateTestContext(httptest.NewRecorder())
+			context.Request = httptest.NewRequest(http.MethodGet, "/w/HtmlTopDoc", nil)
+			config := tool.Config{IP: "admin_ip", Session: &emptySession{}}
+			page, status := route.View_w(context, config, "HtmlTopDoc", "")
+			if status != http.StatusOK {
+				t.Fatalf("View_w status = %d, want %d", status, http.StatusOK)
+			}
+			if !strings.Contains(page, "<b>HTML_VIEW_TOP_MARKER</b>") {
+				t.Fatalf("View_w did not render the stored html document-top markup: %s", page)
+			}
+		})
+	}
+}

@@ -45,7 +45,7 @@ func Save_acl(db tool.DB_runner, config tool.Config, doc_name string, values url
 			continue
 		}
 		tool.Exec_DB(db, "delete from data_set where doc_name = ? and set_name = ?", doc_name, field)
-		tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', ?, ?)", doc_name, field, Setting_markup_storage_value(values.Get(field)))
+		tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', ?, ?)", doc_name, field, Setting_markup_trusted_storage_value(values.Get(field)))
 	}
 
 	tool.Exec_DB(db, "delete from acl where title = ? and type = 'why'", doc_name)
@@ -107,10 +107,13 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 		return return_data
 	}
 
-	for _, field := range []string{"document_markup", "document_top_markup", "document_editor_top_markup"} {
-		if _, exists := values[field]; exists && !Setting_markup_value_valid(values.Get(field)) {
+	for _, field := range []string{"document_top_markup", "document_editor_top_markup"} {
+		if _, exists := values[field]; exists && !Setting_markup_trusted_value_valid(values.Get(field)) {
 			return map[string]any{"response": "error", "data": "invalid data"}
 		}
+	}
+	if _, exists := values["document_markup"]; exists && !Setting_markup_value_valid(values.Get("document_markup")) {
+		return map[string]any{"response": "error", "data": "invalid data"}
 	}
 
 	if values.Get("acl_action") != "" {

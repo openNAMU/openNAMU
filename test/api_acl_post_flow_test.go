@@ -45,8 +45,8 @@ func Test_api_acl_post_preserves_owner_document_settings(t *testing.T) {
 
 			result := route.Api_acl_post(config, "AclPostTarget", false, url.Values{
 				"document_markup":            {"namumark_beta"},
-				"document_top":               {"untrusted replacement"},
-				"document_top_markup":        {"markdown"},
+				"document_top":               {"<script>window.__retired_markup_xss__ = true;</script>"},
+				"document_top_markup":        {"html"},
 				"document_editor_top":        {"untrusted editor replacement"},
 				"document_editor_top_markup": {"markdown"},
 				"why":                        {"ACL update"},

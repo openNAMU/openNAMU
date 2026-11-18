@@ -16,7 +16,7 @@ func Api_setting_phrase_post(config tool.Config, form map[string]string) map[str
 		return return_data
 	}
 	for _, field := range Setting_phrase_fields() {
-		if field.markup && !Setting_markup_value_valid(Setting_form_value(form, field.name+"_markup", "")) {
+		if field.markup && !Setting_markup_trusted_value_valid(Setting_form_value(form, field.name+"_markup", "")) {
 			return map[string]any{"response": "error", "data": "invalid data"}
 		}
 	}
@@ -24,7 +24,7 @@ func Api_setting_phrase_post(config tool.Config, form map[string]string) map[str
 		for _, field := range Setting_phrase_fields() {
 			Setting_save_value(tx, field.name, "", Setting_form_value(form, field.name, ""))
 			if field.markup {
-				Setting_save_value(tx, field.name+"_markup", "", Setting_markup_storage_value(Setting_form_value(form, field.name+"_markup", "")))
+				Setting_save_value(tx, field.name+"_markup", "", Setting_markup_trusted_storage_value(Setting_form_value(form, field.name+"_markup", "")))
 			}
 		}
 		tool.Do_insert_auth_history(tx, config.IP, "edit_set (phrase)")

@@ -58,10 +58,10 @@ func Test_markup_retirement_legacy_rendering_and_surfaces(t *testing.T) {
 			Markup_xss_seed_document(db, t, "OrdinaryLegacyHtml", markup_xss_payload, "html")
 			Markup_xss_seed_document(db, t, "user:alice", markup_xss_payload, "custom")
 			Markup_xss_seed_document(db, t, "InheritedLegacyMarkup", markup_xss_payload, "")
-			seed(`insert into data_set (doc_name, doc_rev, set_name, set_data) values ('OrdinaryLegacyHtml', '', 'document_top', ?)`, markup_xss_payload)
-			seed(`insert into data_set (doc_name, doc_rev, set_name, set_data) values ('OrdinaryLegacyHtml', '', 'document_top_markup', 'html')`)
-			seed(`insert into data_set (doc_name, doc_rev, set_name, set_data) values ('OrdinaryLegacyHtml', '', 'document_editor_top', ?)`, markup_xss_payload)
-			seed(`insert into data_set (doc_name, doc_rev, set_name, set_data) values ('OrdinaryLegacyHtml', '', 'document_editor_top_markup', 'custom')`)
+			seed(`insert into data_set (doc_name, doc_rev, set_name, set_data) values ('TrustedHtmlTop', '', 'document_top', ?)`, markup_xss_payload)
+			seed(`insert into data_set (doc_name, doc_rev, set_name, set_data) values ('TrustedHtmlTop', '', 'document_top_markup', 'html')`)
+			seed(`insert into data_set (doc_name, doc_rev, set_name, set_data) values ('TrustedHtmlTop', '', 'document_editor_top', ?)`, markup_xss_payload)
+			seed(`insert into data_set (doc_name, doc_rev, set_name, set_data) values ('TrustedHtmlTop', '', 'document_editor_top_markup', 'custom')`)
 
 			if got := tool.Get_document_markup(db, "OrdinaryLegacyHtml", "document"); got != "raw" {
 				t.Fatalf("legacy html effective markup = %q, want raw", got)
@@ -85,16 +85,27 @@ func Test_markup_retirement_legacy_rendering_and_surfaces(t *testing.T) {
 				rendered := markup.Get_render_direct(db, "SafeMarkup", markup_xss_payload, safe_markup, "test", "view")["data"]
 				Markup_xss_assert_escaped(t, "safe renderer "+safe_markup, rendered)
 			}
-			for _, legacy_markup := range []string{"html", "custom"} {
-				if got := route.Setting_markup_normalize(legacy_markup); got != "raw" {
-					t.Errorf("legacy setting markup %q normalized to %q, want raw", legacy_markup, got)
-				}
-				Markup_xss_assert_escaped(t, "top markup helper "+legacy_markup, route.Setting_render_markup(db, markup_xss_payload, legacy_markup))
+			// custom stays retired and fail-closed; html is selectable again for the
+			// trusted phrase surfaces owned by setting_phrase admins and owners.
+			if got := route.Setting_markup_normalize("custom"); got != "raw" {
+				t.Errorf("legacy setting markup %q normalized to %q, want raw", "custom", got)
 			}
-			Markup_xss_assert_escaped(t, "editor top markup", route.Document_editor_top_render(db, "OrdinaryLegacyHtml"))
+			Markup_xss_assert_escaped(t, "top markup helper custom", route.Setting_render_markup(db, markup_xss_payload, "custom"))
+			if got := route.Setting_markup_normalize("html"); got != "html" {
+				t.Errorf("trusted setting markup %q normalized to %q, want html", "html", got)
+			}
+			if got := route.Setting_markup_normalize("js"); got != "raw" {
+				t.Errorf("unknown setting markup %q normalized to %q, want raw", "js", got)
+			}
+			if rendered := route.Setting_render_markup(db, markup_xss_payload, "html"); rendered != markup_xss_payload {
+				t.Errorf("trusted setting markup html did not pass through: %q", rendered)
+			}
+			Markup_xss_assert_escaped(t, "editor top markup", route.Document_editor_top_render(db, "TrustedHtmlTop"))
 			// Test the document-top setting separately after removing editor-top content.
-			seed(`delete from data_set where doc_name = 'OrdinaryLegacyHtml' and set_name = 'document_editor_top'`)
-			Markup_xss_assert_escaped(t, "document top markup", route.Document_editor_top_render(db, "OrdinaryLegacyHtml"))
+			seed(`delete from data_set where doc_name = 'TrustedHtmlTop' and set_name = 'document_editor_top'`)
+			if rendered := route.Document_editor_top_render(db, "TrustedHtmlTop"); rendered != markup_xss_payload {
+				t.Errorf("trusted document top markup html did not pass through: %q", rendered)
+			}
 
 			markup_options := markup.List_markup()
 			setting_markup_options := route.Setting_markup_options()
@@ -111,6 +122,14 @@ func Test_markup_retirement_legacy_rendering_and_surfaces(t *testing.T) {
 			init_markup_options, ok := tool.Get_init_set_list("markup")["markup"]["list"].([]string)
 			if !ok || tool.Arr_in_str(init_markup_options, "html") || tool.Arr_in_str(init_markup_options, "custom") || !tool.Arr_in_str(init_markup_options, "raw") {
 				t.Errorf("global markup options contain retired values or omit raw: %#v", init_markup_options)
+			}
+			setting_markup_trusted_options := route.Setting_markup_trusted_options()
+			if !tool.Arr_in_str(setting_markup_trusted_options, "html") || tool.Arr_in_str(setting_markup_trusted_options, "custom") {
+				t.Errorf("trusted setting markup options must offer html without custom: %v", setting_markup_trusted_options)
+			}
+			top_select_ui := route.Setting_markup_select_ui("document_top_markup", "html", "")
+			if !strings.Contains(top_select_ui, `<option value="html" selected>html</option>`) {
+				t.Errorf("trusted markup selector did not offer/select html: %s", top_select_ui)
 			}
 			acl_ui := tool.Get_markup_select_ui(db, tool.Config{IP: "admin_ip", Session: &emptySession{}}, "OrdinaryLegacyHtml", "raw", "", "")
 			if !strings.Contains(acl_ui, `<option value="raw" selected>raw</option>`) || strings.Contains(acl_ui, `<option value="html"`) || strings.Contains(acl_ui, `<option value="custom"`) {
@@ -190,17 +209,12 @@ func Test_markup_retirement_rejects_new_writes_without_partial_updates(t *testin
 			exec(`insert into acl (title, data, type) values ('MarkupWriteTarget', 'prior reason', 'why')`)
 
 			admin_config := tool.Config{IP: "admin_ip", Session: &emptySession{}}
+			// document body markup keeps rejecting the retired values.
 			for _, retired := range []string{"html", "custom"} {
-				for set_name, expected_markup := range map[string]string{
-					"document_markup":            "namumark",
-					"document_top_markup":        "plain",
-					"document_editor_top_markup": "plain",
-				} {
-					Markup_xss_response(t, route.Api_w_set_put(admin_config, "MarkupWriteTarget", set_name, retired), "error")
-					got := tool.Get_document_setting_value(db, "MarkupWriteTarget", set_name, "")
-					if got != expected_markup {
-						t.Errorf("rejected Api_w_set_put changed %s to %q, want %q", set_name, got, expected_markup)
-					}
+				Markup_xss_response(t, route.Api_w_set_put(admin_config, "MarkupWriteTarget", "document_markup", retired), "error")
+				got := tool.Get_document_setting_value(db, "MarkupWriteTarget", "document_markup", "")
+				if got != "namumark" {
+					t.Errorf("rejected Api_w_set_put changed document_markup to %q, want namumark", got)
 				}
 				result := route.Api_acl_post(admin_config, "MarkupWriteTarget", false, url.Values{
 					"document_markup": {retired},
@@ -213,21 +227,46 @@ func Test_markup_retirement_rejects_new_writes_without_partial_updates(t *testin
 				if got := route.Acl_value(db, "MarkupWriteTarget", "why"); got != "prior reason" {
 					t.Errorf("rejected ACL markup %q partially changed why to %q", retired, got)
 				}
-				top_result := route.Api_acl_post(admin_config, "MarkupWriteTarget", false, url.Values{
-					"document_markup":     {"plain"},
-					"document_top_markup": {retired},
-					"why":                 {"should not partially update"},
-				})
-				Markup_xss_response(t, top_result, "error")
-				if got := tool.Get_document_setting_value(db, "MarkupWriteTarget", "document_top_markup", ""); got != "plain" {
-					t.Errorf("rejected top markup %q changed setting to %q", retired, got)
+			}
+			// custom stays rejected on the owner-controlled top markups, html is stored.
+			for _, set_name := range []string{"document_top_markup", "document_editor_top_markup"} {
+				Markup_xss_response(t, route.Api_w_set_put(admin_config, "MarkupWriteTarget", set_name, "custom"), "error")
+				got := tool.Get_document_setting_value(db, "MarkupWriteTarget", set_name, "")
+				if got != "plain" {
+					t.Errorf("rejected Api_w_set_put changed %s to %q, want plain", set_name, got)
 				}
-				if got := tool.Get_document_setting_value(db, "MarkupWriteTarget", "document_markup", ""); got != "namumark" {
-					t.Errorf("rejected top markup %q partially changed document markup to %q", retired, got)
+				Markup_xss_response(t, route.Api_w_set_put(admin_config, "MarkupWriteTarget", set_name, "html"), "ok")
+				got = tool.Get_document_setting_value(db, "MarkupWriteTarget", set_name, "")
+				if got != "html" {
+					t.Errorf("Api_w_set_put stored %s as %q, want html", set_name, got)
 				}
-				if got := route.Acl_value(db, "MarkupWriteTarget", "why"); got != "prior reason" {
-					t.Errorf("rejected top markup %q partially changed why to %q", retired, got)
-				}
+			}
+			top_custom_result := route.Api_acl_post(admin_config, "MarkupWriteTarget", false, url.Values{
+				"document_markup":     {"plain"},
+				"document_top_markup": {"custom"},
+				"why":                 {"should not partially update"},
+			})
+			Markup_xss_response(t, top_custom_result, "error")
+			if got := tool.Get_document_setting_value(db, "MarkupWriteTarget", "document_top_markup", ""); got != "html" {
+				t.Errorf("rejected top markup custom changed setting to %q, want html", got)
+			}
+			if got := tool.Get_document_setting_value(db, "MarkupWriteTarget", "document_markup", ""); got != "namumark" {
+				t.Errorf("rejected top markup custom partially changed document markup to %q", got)
+			}
+			if got := route.Acl_value(db, "MarkupWriteTarget", "why"); got != "prior reason" {
+				t.Errorf("rejected top markup custom partially changed why to %q", got)
+			}
+			top_html_result := route.Api_acl_post(admin_config, "MarkupWriteTarget", false, url.Values{
+				"document_markup":     {"plain"},
+				"document_top_markup": {"html"},
+				"why":                 {"owner selects html"},
+			})
+			Markup_xss_response(t, top_html_result, "ok")
+			if got := tool.Get_document_setting_value(db, "MarkupWriteTarget", "document_top_markup", ""); got != "html" {
+				t.Errorf("accepted top markup html stored %q, want html", got)
+			}
+			if got := tool.Get_document_setting_value(db, "MarkupWriteTarget", "document_markup", ""); got != "plain" {
+				t.Errorf("accepted top markup html changed document markup to %q, want plain", got)
 			}
 
 			Markup_xss_response(t, route.Api_w_set_put(admin_config, "MarkupWriteTarget", "document_markup", "raw"), "ok")
@@ -249,7 +288,7 @@ func Test_markup_retirement_rejects_new_writes_without_partial_updates(t *testin
 			exec(`insert into other (name, data, coverage) values ('body_markup', 'plain', '')`)
 			exec(`insert into other (name, data, coverage) values ('bottom_body', 'OLD_BOTTOM_BODY_SETTING', '')`)
 			exec(`insert into other (name, data, coverage) values ('bottom_body_markup', 'plain', '')`)
-			for _, retired := range []string{"html", "custom"} {
+			for _, retired := range []string{"custom"} {
 				phrase_result := route.Api_setting_phrase_post(tool.Config{IP: "phrase_admin_ip", Session: &emptySession{}}, map[string]string{
 					"body":               "NEW_BODY_SETTING",
 					"body_markup":        retired,
@@ -265,6 +304,26 @@ func Test_markup_retirement_rejects_new_writes_without_partial_updates(t *testin
 				if err := db.QueryRow(`select data from other where name = 'bottom_body' and coverage = ''`).Scan(&bottom_body_setting); err != nil || bottom_body_setting != "OLD_BOTTOM_BODY_SETTING" {
 					t.Errorf("rejected phrase markup %q partially changed bottom body setting: %q, %v", retired, bottom_body_setting, err)
 				}
+			}
+			// phrase admins may select raw html for the global top/bottom phrases.
+			phrase_html_result := route.Api_setting_phrase_post(tool.Config{IP: "phrase_admin_ip", Session: &emptySession{}}, map[string]string{
+				"body":               "NEW_BODY_HTML_SETTING",
+				"body_markup":        "html",
+				"bottom_body":        "NEW_BOTTOM_BODY_HTML_SETTING",
+				"bottom_body_markup": "html",
+			})
+			Markup_xss_response(t, phrase_html_result, "ok")
+			var body_html_setting string
+			if err := db.QueryRow(`select data from other where name = 'body' and coverage = ''`).Scan(&body_html_setting); err != nil || body_html_setting != "NEW_BODY_HTML_SETTING" {
+				t.Errorf("accepted phrase markup html did not save body setting: %q, %v", body_html_setting, err)
+			}
+			var body_html_markup string
+			if err := db.QueryRow(`select data from other where name = 'body_markup' and coverage = ''`).Scan(&body_html_markup); err != nil || body_html_markup != "html" {
+				t.Errorf("accepted phrase markup html stored body_markup %q, want html: %v", body_html_markup, err)
+			}
+			var bottom_body_html_markup string
+			if err := db.QueryRow(`select data from other where name = 'bottom_body_markup' and coverage = ''`).Scan(&bottom_body_html_markup); err != nil || bottom_body_html_markup != "html" {
+				t.Errorf("accepted phrase markup html stored bottom_body_markup %q, want html: %v", bottom_body_html_markup, err)
 			}
 
 			seed_setting_permission("bbs_setting", "bbs_manager_group", "bbs_manager_ip")

@@ -48,7 +48,12 @@ func Api_w_set_put(config tool.Config, doc_name string, set_name string, data st
 		return map[string]any{"response": "require auth"}
 	}
 
-	if set_name == "document_markup" || set_name == "document_top_markup" || set_name == "document_editor_top_markup" {
+	if set_name == "document_top_markup" || set_name == "document_editor_top_markup" {
+		if !Setting_markup_trusted_value_valid(data) {
+			return map[string]any{"response": "error", "data": "invalid data"}
+		}
+		data = Setting_markup_trusted_storage_value(data)
+	} else if set_name == "document_markup" {
 		if !Setting_markup_value_valid(data) {
 			return map[string]any{"response": "error", "data": "invalid data"}
 		}
