@@ -490,6 +490,8 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 		data = Get_language(db, "error_edit_send_request", true)
 	case "checkbox check require":
 		data = Get_language(db, "copyright_disagreed", true)
+	case "sitemap domain require":
+		data = Get_language(db, "sitemap_domain_require_error", true) + ` <a href="/setting/external">(` + Get_language(db, "ext_api_req_set", true) + `)</a>`
 	case "overflow max length":
 		data = Get_language(db, "document_content_max_length_error", true)
 	case "bbs overflow max length":

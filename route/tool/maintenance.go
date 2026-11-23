@@ -1029,6 +1029,15 @@ func Maintenance_sitemap_auto(db *sql.DB) error {
 
 	_, _, err = Make_sitemap(db)
 	if err != nil {
+		// A missing domain setting is a configuration state, not a transient
+		// failure: the sitemap settings page warns about it and manual creation
+		// reports it. Skipping here keeps the daily maintenance cadence instead
+		// of retrying every few minutes.
+		if errors.Is(err, Err_sitemap_domain_require) {
+			log.Printf("[SITEMAP] skipped: domain setting is required")
+			return nil
+		}
+
 		return err
 	}
 

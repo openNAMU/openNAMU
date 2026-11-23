@@ -17,7 +17,7 @@ func View_robots_txt(config tool.Config, request_host string) string {
 	}
 
 	domain := tool.Get_domain(db, true)
-	if domain == "" || domain == "http://" || domain == "https://" {
+	if tool.Domain_setting_is_empty(domain) {
 		domain = "http://" + request_host
 	}
 

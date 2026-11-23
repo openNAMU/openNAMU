@@ -2,6 +2,7 @@
     "language_tag": "ja-JP",
     "sitemap_manual_create": "サイトマップ手動生成",
     "sitemap_auto_make": "サイトマップ自動生成",
+    "sitemap_domain_require_error": "サイトマップを生成するには、先にドメインを設定する必要があります。",
     "delete_admin_group": "権限グループ削除",
     "document_name": "文書名",
     "non_login_alert": "未ログイン通知",

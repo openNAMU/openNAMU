@@ -47,6 +47,10 @@ func View_setting_sitemap_set_data(db *sql.DB, config tool.Config, values map[st
 		}
 	}
 
+	if values["sitemap_auto_exclude_domain"] == "" && tool.Domain_setting_is_empty(tool.Get_domain(db, true)) {
+		data.WriteString(Main_hr() + `<div>` + lang("sitemap_domain_require_error") + ` <a href="/setting/external">(` + lang("ext_api_req_set") + `)</a></div>`)
+	}
+
 	data.WriteString(Main_hr() + `<form method="post">`)
 	data.WriteString(`<a href="/setting/sitemap">(` + lang("sitemap_manual_create") + `)</a>` + Main_hr())
 	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_make" ` + Setting_checked(values["sitemap_auto_make"]) + `> ` + lang("sitemap_auto_make") + `</label>` + Main_hr())

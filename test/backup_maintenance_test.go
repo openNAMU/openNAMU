@@ -929,6 +929,9 @@ func Test_scheduler_failed_maintenance_does_not_record_success(t *testing.T) {
 	db := new_test_db(t, db_path)
 	set_test_setting(db, t, "back_up", "")
 	set_test_setting(db, t, "sitemap_auto_make", "1")
+	// A configured domain lets the sitemap task reach the document query, so the
+	// dropped `data` table below is what makes maintenance fail here.
+	set_test_setting(db, t, "domain", "wiki.example.org")
 	if _, err := db.Exec(`drop table data`); err != nil {
 		t.Fatalf("inject sitemap query failure: %v", err)
 	}
@@ -1530,6 +1533,7 @@ func Test_Maintenance_daily_turso_backend(t *testing.T) {
 	set_test_setting(db, t, "ua_expiration_date", "1")
 	set_test_setting(db, t, "auth_history_expiration_date", "1")
 	set_test_setting(db, t, "sitemap_auto_make", "1")
+	set_test_setting(db, t, "domain", "wiki.example.org")
 	if _, err := db.Exec(`insert into alist (name, acl) values ('turso_admin_title', 'all_admin_auth')`); err != nil {
 		t.Fatal(err)
 	}
@@ -2518,6 +2522,7 @@ func Test_Maintenance_sitemap_auto(t *testing.T) {
 	}
 
 	set_test_setting(db, t, "sitemap_auto_make", "1")
+	set_test_setting(db, t, "domain", "wiki.example.org")
 	set_test_setting(db, t, "ua_expiration_date", "")
 	set_test_setting(db, t, "auth_history_expiration_date", "")
 
@@ -2550,6 +2555,11 @@ func Test_Api_setting_sitemap_post_preserves_file_error(t *testing.T) {
 		t.Fatal(err)
 	}
 	if _, err := db.Exec(`insert into data (title, data, type) values ('Doc', 'content', 'd')`); err != nil {
+		t.Fatal(err)
+	}
+	// Make_sitemap requires a configured domain before writing files; this
+	// test only covers the file write error contract.
+	if _, err := db.Exec(`insert into other (name, data, coverage) values ('domain', 'wiki.example.org', '')`); err != nil {
 		t.Fatal(err)
 	}
 	tool.DB_close(db)

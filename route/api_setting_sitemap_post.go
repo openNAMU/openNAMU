@@ -1,7 +1,7 @@
 package route
 
 import (
-	"strings"
+	"errors"
 
 	"opennamu/route/tool"
 )
@@ -20,7 +20,14 @@ func Api_setting_sitemap_post(config tool.Config) map[string]any {
 
 	sitemap_count, document_count, err := tool.Make_sitemap(db)
 	if err != nil {
-		if !strings.HasPrefix(err.Error(), "file write error : ") {
+		if errors.Is(err, tool.Err_sitemap_domain_require) {
+			return_data["response"] = "error"
+			return_data["data"] = "sitemap domain require"
+
+			return return_data
+		}
+
+		if !errors.Is(err, tool.Err_sitemap_file_write) && !errors.Is(err, tool.Err_sitemap_file_remove) {
 			panic(err)
 		}
 

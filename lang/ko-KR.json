@@ -2,6 +2,7 @@
     "language_tag": "ko-KR",
     "sitemap_manual_create": "사이트맵 수동 생성",
     "sitemap_auto_make": "사이트맵 자동 생성",
+    "sitemap_domain_require_error": "사이트맵을 생성하려면 먼저 도메인을 설정해야 합니다.",
     "delete_admin_group": "권한 그룹 삭제",
     "document_name": "문서명",
     "non_login_alert": "비로그인 알림",

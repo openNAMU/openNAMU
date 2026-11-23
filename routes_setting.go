@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"strconv"
 
 	"opennamu/route"
 
@@ -138,29 +137,7 @@ func Register_setting_routes(r *gin.Engine) {
 		data := route.View_robots_txt(Make_route_config(c), c.Request.Host)
 		Write_data(c, http.StatusOK, "text/plain; charset=utf-8", []byte(data))
 	})
-	r.GET("/sitemap.xml", func(c *gin.Context) {
-		data, ok := route.Read_sitemap_file("sitemap.xml")
-		if !ok {
-			c.Status(http.StatusNotFound)
-			return
-		}
-		Write_data(c, http.StatusOK, "application/xml; charset=utf-8", []byte(data))
-	})
-	r.GET("/sitemap_:num.xml", func(c *gin.Context) {
-		num, err := strconv.Atoi(c.Param("num"))
-		if err != nil {
-			c.Status(http.StatusNotFound)
-			return
-		}
-
-		name := "sitemap_" + strconv.Itoa(num) + ".xml"
-		data, ok := route.Read_sitemap_file(name)
-		if !ok {
-			c.Status(http.StatusNotFound)
-			return
-		}
-		Write_data(c, http.StatusOK, "application/xml; charset=utf-8", []byte(data))
-	})
+	route.Register_sitemap_file_routes(r)
 }
 
 func Setting_form(c *gin.Context) map[string]string {

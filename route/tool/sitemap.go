@@ -2,10 +2,23 @@ package tool
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
 )
+
+var Err_sitemap_domain_require = errors.New("sitemap domain require")
+var Err_sitemap_file_write = errors.New("file write error")
+var Err_sitemap_file_remove = errors.New("file remove error")
+
+// Domain_setting_is_empty reports whether the full domain string is unusable
+// because the domain setting is missing (empty or scheme only).
+func Domain_setting_is_empty(domain string) bool {
+	return domain == "" || domain == "http://" || domain == "https://"
+}
 
 func Make_sitemap(db *sql.DB) (int, int, error) {
 	domain := ""
@@ -13,6 +26,9 @@ func Make_sitemap(db *sql.DB) (int, int, error) {
 	sitemap_auto_exclude_domain := Get_setting_value(db, "sitemap_auto_exclude_domain", "", "")
 	if sitemap_auto_exclude_domain == "" {
 		domain = Get_domain(db, true)
+		if Domain_setting_is_empty(domain) {
+			return 0, 0, Err_sitemap_domain_require
+		}
 	}
 
 	sql_add := ""
@@ -73,7 +89,7 @@ func Make_sitemap(db *sql.DB) (int, int, error) {
 	data.WriteString("</sitemapindex>")
 
 	if err := Write_file("sitemap.xml", data.String(), 0644); err != nil {
-		return 0, 0, fmt.Errorf("file write error : sitemap.xml")
+		return 0, 0, fmt.Errorf("%w : sitemap.xml", Err_sitemap_file_write)
 	}
 
 	for i := 0; i < count; i++ {
@@ -103,11 +119,43 @@ func Make_sitemap(db *sql.DB) (int, int, error) {
 
 		file_name := "sitemap_" + fmt.Sprint(i) + ".xml"
 		if err := Write_file(file_name, data.String(), 0644); err != nil {
-			return 0, 0, fmt.Errorf("file write error : %s", file_name)
+			return 0, 0, fmt.Errorf("%w : %s", Err_sitemap_file_write, file_name)
 		}
 	}
 
+	// The index and every current part are written, so parts left over from a
+	// previous run with more documents can be removed safely now.
+	if err := Remove_sitemap_stale_files(count); err != nil {
+		return 0, 0, err
+	}
+
 	return count, len(titles), nil
+}
+
+// Remove_sitemap_stale_files removes sitemap_N.xml files whose index is not
+// referenced by the current sitemap index (index >= count).
+func Remove_sitemap_stale_files(count int) error {
+	files, err := filepath.Glob("sitemap_*.xml")
+	if err != nil {
+		return fmt.Errorf("%w : %s", Err_sitemap_file_remove, "sitemap_*.xml")
+	}
+
+	for _, file_name := range files {
+		middle := strings.TrimSuffix(strings.TrimPrefix(file_name, "sitemap_"), ".xml")
+		index, err := strconv.Atoi(middle)
+		if err != nil {
+			continue
+		}
+		if index < count {
+			continue
+		}
+
+		if err := os.Remove(file_name); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("%w : %s", Err_sitemap_file_remove, file_name)
+		}
+	}
+
+	return nil
 }
 
 func Query_titles(db *sql.DB, query string) ([]string, error) {
