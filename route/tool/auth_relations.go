@@ -43,7 +43,7 @@ func Auth_relations() []Auth_relation {
 	add("trust_a", "bbs_comment_limit_unlimited", Auth_relation_permission)
 	add("trust_b", "bbs_comment_limit_unlimited", Auth_relation_permission)
 
-	for _, permission := range []string{"check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix", "ai_use"} {
+	for _, permission := range []string{"check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix", "calendar_manage", "ai_use"} {
 		add("admin", permission, Auth_relation_permission)
 	}
 	for _, permission := range []string{"edit_filter_manage", "application_manage", "application_view"} {
@@ -93,6 +93,7 @@ func Auth_relations() []Auth_relation {
 	add("bbs_manage", "bbs_pin", Auth_relation_permission)
 	add("bbs_manage", "bbs_main_view", Auth_relation_permission)
 	add("vote_fix", "vote_manage", Auth_relation_permission)
+	add("calendar_manage", "calendar_create", Auth_relation_permission)
 	add("check", "view_user_watchlist", Auth_relation_permission)
 
 	for _, permission := range []string{"check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix"} {
@@ -144,6 +145,7 @@ func Auth_relations() []Auth_relation {
 		"edit_limit_100",
 		"bbs_edit_limit_100",
 		"bbs_comment_limit_100",
+		"calendar_create",
 	} {
 		add("user", permission, Auth_relation_auto)
 	}

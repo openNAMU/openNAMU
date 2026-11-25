@@ -1,6 +1,10 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"opennamu/route"
+
+	"github.com/gin-gonic/gin"
+)
 
 func Register_routes(r *gin.Engine) {
 	Register_access_routes(r)
@@ -31,6 +35,7 @@ func Register_routes(r *gin.Engine) {
 	Register_auth_give_list_routes(r)
 	Register_recent_routes(r)
 	Register_vote_routes(r)
+	route.Register_calendar_routes(r)
 	Register_bbs_routes(r)
 	Register_bbs_search_routes(r)
 	Register_thread_routes(r)

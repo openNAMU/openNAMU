@@ -821,6 +821,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		for _, v := range admin_auth {
 			auth_info[v] = true
 		}
+		auth_info["calendar_manage"] = true
 		auth_info["edit_filter_manage"] = true
 		auth_info["application_manage"] = true
 		auth_info["application_view"] = true
@@ -862,6 +863,10 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		} {
 			auth_info[permission] = true
 		}
+	}
+
+	if _, ok := auth_info["calendar_manage"]; ok {
+		auth_info["calendar_create"] = true
 	}
 
 	if _, ok := auth_info["history_manage"]; ok {
@@ -919,6 +924,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		"edit_limit_100",
 		"bbs_edit_limit_100",
 		"bbs_comment_limit_100",
+		"calendar_create",
 	}
 
 	if _, ok := auth_info["user"]; ok {
